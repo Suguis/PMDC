@@ -75,6 +75,27 @@ namespace PMDC.LevelGen
             }
         }
 
+
+        protected void AddIntrudeStep(T map, CheckIntrudeBoundsLocsEvent check)
+        {
+            //TODO: remove this magic number
+            string intrudeStatus = "intrusion_check";
+            MapStatus status;
+            if (map.Map.Status.TryGetValue(intrudeStatus, out status))
+            {
+                MapCheckState destChecks = status.StatusStates.GetWithDefault<MapCheckState>();
+                destChecks.CheckEvents.Add(check);
+            }
+            else
+            {
+                status = new MapStatus(intrudeStatus);
+                status.LoadFromData();
+                MapCheckState checkState = status.StatusStates.GetWithDefault<MapCheckState>();
+                checkState.CheckEvents.Add(check);
+                map.Map.Status.Add(intrudeStatus, status);
+            }
+        }
+
         public abstract MonsterHouseBaseStep<T> CreateNew();
         IMonsterHouseBaseStep IMonsterHouseBaseStep.CreateNew() { return CreateNew(); }
     }

@@ -474,7 +474,7 @@ namespace PMDC.Dungeon
     [Serializable]
     public class HealEvent : SingleCharEvent
     {
-        
+
 
         public HealEvent() { }
         public override GameEvent Clone() { return new HealEvent(); }
@@ -525,7 +525,7 @@ namespace PMDC.Dungeon
                     if (DungeonScene.Instance.GetMatchup(context.User, target) != Alignment.Foe)
                         eligibleTargets.Add(target);
                 }
-                foreach(Character target in eligibleTargets)
+                foreach (Character target in eligibleTargets)
                     yield return CoroutineManager.Instance.StartCoroutine(target.InflictDamage(((StatusEffect)owner).StatusStates.GetWithDefault<HPState>().HP));
             }
         }
@@ -558,7 +558,7 @@ namespace PMDC.Dungeon
     public class SoundEvent : SingleCharEvent
     {
         public string Sound;
-        
+
         public override GameEvent Clone() { return new SoundEvent(); }
 
         public override IEnumerator<YieldInstruction> Apply(GameEventOwner owner, Character ownerChar, SingleCharContext context)
@@ -1711,16 +1711,16 @@ namespace PMDC.Dungeon
         public ImpostorReviveEvent(string abilityID, string statusID) { AbilityID = abilityID; StatusID = statusID; }
         protected ImpostorReviveEvent(ImpostorReviveEvent other) { this.AbilityID = other.AbilityID; this.StatusID = other.StatusID; }
         public override GameEvent Clone() { return new ImpostorReviveEvent(this); }
-        
+
         public override IEnumerator<YieldInstruction> Apply(GameEventOwner owner, Character ownerChar, SingleCharContext context)
         {
             if (!context.User.Dead)
                 yield break;
-            
+
             StatusEffect transform = context.User.GetStatusEffect(StatusID);
             if (transform == null)
                 yield break;
-            
+
             foreach (string id in context.User.BaseIntrinsics)
             {
                 if (id == AbilityID)
@@ -1847,7 +1847,7 @@ namespace PMDC.Dungeon
         {
             ItemData entry = DataManager.Instance.GetItem(itemId);
 
-            foreach(SingleCharEvent effect in entry.OnDeaths.EnumerateInOrder())
+            foreach (SingleCharEvent effect in entry.OnDeaths.EnumerateInOrder())
             {
                 if (effect is AutoReviveEvent)
                 {
@@ -2073,7 +2073,7 @@ namespace PMDC.Dungeon
                 yield break;
             if (context.User.CharStates.Contains<MagicGuardState>())
                 yield break;
-            
+
             if (Message.IsValid())
                 DungeonScene.Instance.LogMsg(Text.FormatGrammar(Message.ToLocal(), context.User.GetDisplayName(false), owner.GetDisplayName()));
 
@@ -2083,7 +2083,7 @@ namespace PMDC.Dungeon
             int stack = ((StatusEffect)owner).StatusStates.GetWithDefault<CountState>().Count;
             int trapdmg = Math.Max(1, context.User.MaxHP * stack / 16);
             yield return CoroutineManager.Instance.StartCoroutine(context.User.InflictDamage(trapdmg));
-            
+
         }
     }
 
@@ -2158,9 +2158,9 @@ namespace PMDC.Dungeon
             Range = range;
             HPFraction = hpFraction;
         }
-        
+
         public LeechSeedEvent() { }
-        
+
         protected LeechSeedEvent(LeechSeedEvent other)
         {
             Message = other.Message;
@@ -2174,7 +2174,7 @@ namespace PMDC.Dungeon
                 yield break;
             if (context.User.Dead)
                 yield break;
-                    
+
             //check for someone within X tiles away; if there's no one, then remove the status
             List<Character> targets = AreaAction.GetTargetsInArea(context.User, context.User.CharLoc, Alignment.Foe, Range);
             int lowestDist = Int32.MaxValue;
@@ -2196,7 +2196,7 @@ namespace PMDC.Dungeon
                 int seeddmg = Math.Max(1, context.User.MaxHP / HPFraction);
 
                 DungeonScene.Instance.LogMsg(Text.FormatGrammar(Message.ToLocal(), context.User.GetDisplayName(false)));
-                
+
                 GameManager.Instance.BattleSE("DUN_Hit_Neutral");
                 if (!context.User.Unidentifiable)
                 {
@@ -2284,7 +2284,7 @@ namespace PMDC.Dungeon
     public class BurnEvent : SingleCharEvent
     {
         public int HPFraction;
-        
+
         public BurnEvent() { }
         public BurnEvent(int hpFraction)
         {
@@ -2345,7 +2345,7 @@ namespace PMDC.Dungeon
         public bool AffectNonFocused;
         public int HPFraction;
         public int RestoreHPFraction;
-        
+
         public PoisonSingleEvent() { }
         public PoisonSingleEvent(bool toxic, bool affectNonFocused, int hpFraction, int restoreHpFraction)
         {
@@ -2505,7 +2505,8 @@ namespace PMDC.Dungeon
         public int HPFraction;
 
         public RegeneratorEvent() { }
-        public RegeneratorEvent(int range, int hpFraction) { 
+        public RegeneratorEvent(int range, int hpFraction)
+        {
             Range = range;
             HPFraction = hpFraction;
         }
@@ -2575,7 +2576,7 @@ namespace PMDC.Dungeon
         public SingleCharEvent BaseEvent;
 
         public ChanceEvent() { }
-        public ChanceEvent(int chance, SingleCharEvent baseEffect) { Chance = chance;  BaseEvent = baseEffect; }
+        public ChanceEvent(int chance, SingleCharEvent baseEffect) { Chance = chance; BaseEvent = baseEffect; }
         protected ChanceEvent(ChanceEvent other)
         {
             Chance = other.Chance;
@@ -2783,7 +2784,8 @@ namespace PMDC.Dungeon
             if (!ZoneManager.Instance.CurrentMap.Status.ContainsKey(SniffedStatusID))
             {
                 Loc? loc = Grid.FindClosestConnectedTile(context.User.CharLoc - new Loc(CharAction.MAX_RANGE), new Loc(CharAction.MAX_RANGE * 2 + 1),
-                    (Loc testLoc) => {
+                    (Loc testLoc) =>
+                    {
 
                         Tile tile = ZoneManager.Instance.CurrentMap.GetTile(testLoc);
                         if (tile == null)
@@ -2793,10 +2795,12 @@ namespace PMDC.Dungeon
                             return true;
                         return false;
                     },
-                    (Loc testLoc) => {
+                    (Loc testLoc) =>
+                    {
                         return ZoneManager.Instance.CurrentMap.TileBlocked(testLoc, true);
                     },
-                    (Loc testLoc) => {
+                    (Loc testLoc) =>
+                    {
                         return ZoneManager.Instance.CurrentMap.TileBlocked(testLoc, true, true);
                     },
                     context.User.CharLoc);
@@ -3712,7 +3716,7 @@ namespace PMDC.Dungeon
                         FiniteEmitter endEmitter = (FiniteEmitter)Emitter.Clone();
                         endEmitter.SetupEmit(DungeonScene.Instance.GetFocusedMapLoc(), DungeonScene.Instance.GetFocusedMapLoc(), Dir8.None);
                         DungeonScene.Instance.CreateAnim(endEmitter, DrawLayer.NoDraw);
-                        
+
                         if (GameManager.Instance.Song != BGM)
                         {
                             GameManager.Instance.Fanfare("Battle/" + WarningSE2);
@@ -3982,7 +3986,7 @@ namespace PMDC.Dungeon
         {
             PercentChance = chance;
             CheckSpecies = new HashSet<string>();
-            foreach(string monster in species)
+            foreach (string monster in species)
                 CheckSpecies.Add(monster);
         }
         public StealthEvoEvent(StealthEvoEvent other)
@@ -4242,7 +4246,7 @@ namespace PMDC.Dungeon
 
         public override IEnumerator<YieldInstruction> Apply(GameEventOwner owner, Character ownerChar, SingleCharContext context)
         {
-            foreach(Character player in DungeonScene.Instance.ActiveTeam.EnumerateChars())
+            foreach (Character player in DungeonScene.Instance.ActiveTeam.EnumerateChars())
                 DataManager.Instance.Save.RestrictCharLevel(player, Level, false, false);
             foreach (Character player in DungeonScene.Instance.ActiveTeam.Assembly)
                 DataManager.Instance.Save.RestrictCharLevel(player, Level, false, false);
@@ -4636,7 +4640,7 @@ namespace PMDC.Dungeon
                 }
             }
         }
-        
+
         public void MoveChar(Character character, int total_alive)
         {
             character.CharDir = ZoneManager.Instance.CurrentMap.EntryPoints[0].Dir;
@@ -4849,7 +4853,7 @@ namespace PMDC.Dungeon
                         context.User.StartEmote(new Emote(emoteData.Anim, emoteData.LocHeight, 1));
                     }
 
-                    yield return new WaitForFrames(GameManager.Instance.ModifyBattleSpeed(20)+20);
+                    yield return new WaitForFrames(GameManager.Instance.ModifyBattleSpeed(20) + 20);
                 }
             }
         }
@@ -4883,29 +4887,29 @@ namespace PMDC.Dungeon
         /// Data on the hitbox of the attack. Controls range and targeting
         /// </summary>
         public CombatAction HitboxAction;
-        
+
         /// <summary>
         /// Optional data to specify a splash effect on the tiles hit
         /// </summary>
         public ExplosionData Explosion;
-        
+
         /// <summary>
         /// Events that occur with this trap.
         /// Before it's used, when it hits, after it's used, etc
         /// </summary>
-        public BattleData NewData; 
-        
+        public BattleData NewData;
+
         /// <summary>
         /// The message displayed when the trap is triggered
         /// </summary>
         [StringKey(0, true)]
         public StringKey Message;
-                
+
         /// <summary>
         /// Whether the trap can be activated only once
         /// </summary>
         public bool OneTime;
-        
+
         public InvokeTrapEvent() { }
         public InvokeTrapEvent(CombatAction action, ExplosionData explosion, BattleData moveData, StringKey msg, bool oneTime)
         {
@@ -4972,7 +4976,7 @@ namespace PMDC.Dungeon
             newContext.SetActionMsg(Text.FormatGrammar(Message.ToLocal(), newContext.User.GetDisplayName(false), entry.Name.ToLocal()));
 
             //process the attack
-            
+
             yield return CoroutineManager.Instance.StartCoroutine(DungeonScene.Instance.PreProcessAction(newContext));
 
             //Handle Use
@@ -5616,21 +5620,21 @@ namespace PMDC.Dungeon
         }
 
     }
-    
+
     /// <summary>
     /// This event spawns a number of items from the source tile/object onto the tiles around it, like the ChestEvent
     /// item spawning.
     /// </summary>
-     [Serializable]
+    [Serializable]
     public class SpawnItemsEvent : SingleCharEvent
     {
         public List<MapItem> Items;
-        
+
         /// <summary>
         /// Max range/distance to spawn from the origin.
         /// </summary>
         public int MaxRangeWidth;
-        
+
         /// <summary>
         /// Max range/distance to spawn from the origin.
         /// </summary>
@@ -5643,7 +5647,7 @@ namespace PMDC.Dungeon
             EffectTile effectTile = (EffectTile)owner;
 
             Loc baseLoc = effectTile.TileLoc;
-            
+
             //spawn the items
             int locX = baseLoc.X;
             int locY = baseLoc.Y;
@@ -5668,7 +5672,7 @@ namespace PMDC.Dungeon
                 });
 
             int waitTime = GameManager.Instance.ModifyBattleSpeed(ItemAnim.ITEM_ACTION_TIME);
-            
+
             List<MapItem> spawnItems = new List<MapItem>();
             //spawn their animations
             for (int ii = 0; ii < Items.Count; ii++)
@@ -5690,7 +5694,7 @@ namespace PMDC.Dungeon
 
             if (waitTime > 0)
                 yield return new WaitForFrames(waitTime);
-            
+
             //place the actual items
             for (int ii = 0; ii < spawnItems.Count; ii++)
                 ZoneManager.Instance.CurrentMap.Items.Add(spawnItems[ii]);
@@ -5699,16 +5703,16 @@ namespace PMDC.Dungeon
         }
 
     }
-    
+
     /// <summary>
     /// This event spawns a number of enemy mobs from the source tile/object onto the tiles around it, like the ChestEvent
     /// item spawning.
     /// </summary>
-     [Serializable]
+    [Serializable]
     public class SpawnEnemiesEvent : SingleCharEvent
     {
         public List<MobSpawn> Enemies;
-        
+
         /// <summary>
         /// Max range/distance to spawn from the origin.
         /// </summary>
@@ -5725,7 +5729,7 @@ namespace PMDC.Dungeon
             EffectTile effectTile = (EffectTile)owner;
 
             Loc baseLoc = effectTile.TileLoc;
-            
+
             int locX = baseLoc.X;
             int locY = baseLoc.Y;
             int xWithBorders = MaxRangeWidth + 1;
@@ -5763,7 +5767,7 @@ namespace PMDC.Dungeon
                     }
                     return false;
                 });
-            
+
             //spawn in mobs
             List<Character> respawns = new List<Character>();
             for (int ii = 0; ii < Enemies.Count; ii++)
@@ -5812,24 +5816,24 @@ namespace PMDC.Dungeon
         }
 
     }
-     
-     /// <summary>
-     /// This event spawns a number of items from the source tile/object onto the tiles around it, like the ChestEvent
-     /// item spawning.  It picks the data randomly from a spawn list.
-     /// </summary>
-     [Serializable]
+
+    /// <summary>
+    /// This event spawns a number of items from the source tile/object onto the tiles around it, like the ChestEvent
+    /// item spawning.  It picks the data randomly from a spawn list.
+    /// </summary>
+    [Serializable]
     public class SpawnRandomItemsEvent : SingleCharEvent
     {
         public SpawnList<MapItem> Items;
 
         public int MinAmount;
         public int MaxAmount;
-        
+
         /// <summary>
         /// Max range/distance to spawn from the origin.
         /// </summary>
         public int MaxRangeWidth;
-        
+
         /// <summary>
         /// Max range/distance to spawn from the origin.
         /// </summary>
@@ -5842,7 +5846,7 @@ namespace PMDC.Dungeon
             EffectTile effectTile = (EffectTile)owner;
 
             Loc baseLoc = effectTile.TileLoc;
-            
+
             //spawn the items
             int locX = baseLoc.X;
             int locY = baseLoc.Y;
@@ -5867,7 +5871,7 @@ namespace PMDC.Dungeon
                 });
 
             int waitTime = GameManager.Instance.ModifyBattleSpeed(ItemAnim.ITEM_ACTION_TIME);
-            
+
             List<MapItem> spawnItems = new List<MapItem>();
             int amount = DataManager.Instance.Save.Rand.Next(MinAmount, MaxAmount);
             //spawn their animations
@@ -5891,7 +5895,7 @@ namespace PMDC.Dungeon
 
             if (waitTime > 0)
                 yield return new WaitForFrames(waitTime);
-            
+
             //place the actual items
             for (int ii = 0; ii < spawnItems.Count; ii++)
                 ZoneManager.Instance.CurrentMap.Items.Add(spawnItems[ii]);
@@ -5900,18 +5904,18 @@ namespace PMDC.Dungeon
         }
 
     }
-    
-     /// <summary>
-     /// This event spawns a number of enemy mobs from the source tile/object onto the tiles around it, like the ChestEvent
-     /// item spawning.  It picks the data randomly from a spawn list.
-     /// </summary>
-     [Serializable]
+
+    /// <summary>
+    /// This event spawns a number of enemy mobs from the source tile/object onto the tiles around it, like the ChestEvent
+    /// item spawning.  It picks the data randomly from a spawn list.
+    /// </summary>
+    [Serializable]
     public class SpawnRandomEnemiesEvent : SingleCharEvent
     {
         public SpawnList<MobSpawn> Enemies;
         public int MinAmount;
         public int MaxAmount;
-        
+
         /// <summary>
         /// Max range/distance to spawn from the origin.
         /// </summary>
@@ -5928,7 +5932,7 @@ namespace PMDC.Dungeon
             EffectTile effectTile = (EffectTile)owner;
 
             Loc baseLoc = effectTile.TileLoc;
-            
+
             int locX = baseLoc.X;
             int locY = baseLoc.Y;
             int xWithBorders = MaxRangeWidth + 1;
@@ -5967,7 +5971,7 @@ namespace PMDC.Dungeon
                     return false;
                 });
 
-            
+
             //spawn in mobs
             List<Character> respawns = new List<Character>();
             int amount = DataManager.Instance.Save.Rand.Next(MinAmount, MaxAmount);
@@ -5975,7 +5979,7 @@ namespace PMDC.Dungeon
             {
                 if (freeTiles.Count == 0)
                     break;
-                
+
                 MonsterTeam team = new MonsterTeam();
                 int spawnIndex = Enemies.PickIndex(ZoneManager.Instance.CurrentMap.Rand);
                 Character mob = Enemies.GetSpawn(spawnIndex).Copy().Spawn(team, ZoneManager.Instance.CurrentMap);
@@ -6019,29 +6023,29 @@ namespace PMDC.Dungeon
 
     }
 
-     /// <summary>
-     /// This event transforms a specific tile into another tile.
-     /// </summary>
-     [Serializable]
-     public class TransformTileEvent : SingleCharEvent
-     {
-         public EffectTile TileToTransformInto;
-         public TransformTileEvent() { }
-         public override GameEvent Clone() { return new TransformTileEvent(); }
+    /// <summary>
+    /// This event transforms a specific tile into another tile.
+    /// </summary>
+    [Serializable]
+    public class TransformTileEvent : SingleCharEvent
+    {
+        public EffectTile TileToTransformInto;
+        public TransformTileEvent() { }
+        public override GameEvent Clone() { return new TransformTileEvent(); }
 
-         public override IEnumerator<YieldInstruction> Apply(GameEventOwner owner, Character ownerChar,SingleCharContext context)
-         {
-             EffectTile effectTile = (EffectTile)owner;
-             Loc baseLoc = effectTile.TileLoc;
-             Tile tile = ZoneManager.Instance.CurrentMap.Tiles[baseLoc.X][baseLoc.Y];
-             if (tile.Effect == owner)
-                 tile.Effect = new EffectTile(TileToTransformInto.ID, true, tile.Effect.TileLoc);// magic number
-             
-             yield return new WaitForFrames(GameManager.Instance.ModifyBattleSpeed(10));
-         }
+        public override IEnumerator<YieldInstruction> Apply(GameEventOwner owner, Character ownerChar, SingleCharContext context)
+        {
+            EffectTile effectTile = (EffectTile)owner;
+            Loc baseLoc = effectTile.TileLoc;
+            Tile tile = ZoneManager.Instance.CurrentMap.Tiles[baseLoc.X][baseLoc.Y];
+            if (tile.Effect == owner)
+                tile.Effect = new EffectTile(TileToTransformInto.ID, true, tile.Effect.TileLoc);// magic number
 
-     }
-    
+            yield return new WaitForFrames(GameManager.Instance.ModifyBattleSpeed(10));
+        }
+
+    }
+
 
     [Serializable]
     public class LockedTile
@@ -6097,7 +6101,7 @@ namespace PMDC.Dungeon
             //keep track of the locked tiles
 
             //shove the affected chars off
-            foreach(Character moveChar in moveChars)
+            foreach (Character moveChar in moveChars)
             {
                 //if (moveChar.MemberTeam == ZoneManager.Instance.CurrentMap.ActiveTeam)
                 //    continue;
@@ -6552,7 +6556,7 @@ namespace PMDC.Dungeon
             List<Loc> freeTiles = new List<Loc>();
 
             GameManager.Instance.BattleSE("DUN_One_Room_Orb");
-            for (int xx = bounds.X; xx < bounds.End.X; xx++) 
+            for (int xx = bounds.X; xx < bounds.End.X; xx++)
             {
                 for (int yy = bounds.Y; yy < bounds.End.Y; yy++)
                 {
@@ -6646,11 +6650,11 @@ namespace PMDC.Dungeon
             if (Phases.Count > 1)
             {
                 CheckTurnsPassedEvent check = new CheckTurnsPassedEvent();
-                check.TurnTotal = DataManager.Instance.Save.TotalTurns+1;
+                check.TurnTotal = DataManager.Instance.Save.TotalTurns + 1;
 
                 MonsterHallMapEvent house = new MonsterHallMapEvent();
                 house.Continuation = true;
-                for(int ii = 1; ii < Phases.Count; ii++)
+                for (int ii = 1; ii < Phases.Count; ii++)
                     house.Phases.Add(Phases[ii]);
                 for (int ii = 1; ii < Mobs.Count; ii++)
                     house.Mobs.Add(Mobs[ii]);
@@ -6844,6 +6848,46 @@ namespace PMDC.Dungeon
                 foreach (Character player in ZoneManager.Instance.CurrentMap.ActiveTeam.Players)
                 {
                     if (!player.Dead && ZoneManager.Instance.CurrentMap.InBounds(Bounds, player.CharLoc))
+                    {
+                        //remove this from the map
+                        MapCheckState checks = ((MapStatus)owner).StatusStates.GetWithDefault<MapCheckState>();
+                        checks.CheckEvents.Remove(this);
+                        //activate the single char effects
+                        for (int ii = 0; ii < Effects.Count; ii++)
+                            yield return CoroutineManager.Instance.StartCoroutine(Effects[ii].Apply(owner, ownerChar, context));
+
+                        yield break;
+                    }
+                }
+            }
+        }
+    }
+
+    [Serializable]
+    public class CheckIntrudeBoundsLocsEvent : SingleCharEvent
+    {
+        //activated by map; use the variables set here
+        public Func<Loc, bool> IsInBounds;
+        public List<SingleCharEvent> Effects;
+
+        public CheckIntrudeBoundsLocsEvent() { Effects = new List<SingleCharEvent>(); }
+        protected CheckIntrudeBoundsLocsEvent(CheckIntrudeBoundsLocsEvent other) : this()
+        {
+            IsInBounds = other.IsInBounds;
+            Effects = new List<SingleCharEvent>();
+            foreach (SingleCharEvent effect in other.Effects)
+                Effects.Add((SingleCharEvent)effect.Clone());
+        }
+        public override GameEvent Clone() { return new CheckIntrudeBoundsLocsEvent(this); }
+
+        public override IEnumerator<YieldInstruction> Apply(GameEventOwner owner, Character ownerChar, SingleCharContext context)
+        {
+            TurnOrder currentTurn = ZoneManager.Instance.CurrentMap.CurrentTurnMap.CurrentOrder;
+            if (currentTurn.Faction == Faction.Player && currentTurn.TurnIndex == 0 && currentTurn.TurnTier == 0)//only check on a fresh turn
+            {
+                foreach (Character player in ZoneManager.Instance.CurrentMap.ActiveTeam.Players)
+                {
+                    if (!player.Dead && IsInBounds(player.CharLoc))
                     {
                         //remove this from the map
                         MapCheckState checks = ((MapStatus)owner).StatusStates.GetWithDefault<MapCheckState>();

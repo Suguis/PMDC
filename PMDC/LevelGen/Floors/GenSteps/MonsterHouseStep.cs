@@ -44,7 +44,7 @@ namespace PMDC.LevelGen
 
             //choose a room to cram all the items in
             List<int> possibleRooms = new List<int>();
-            for(int ii = 0; ii < map.RoomPlan.RoomCount; ii++)
+            for (int ii = 0; ii < map.RoomPlan.RoomCount; ii++)
             {
                 //Monster houses will never spawn in the starting room if no monster house entrances is set
                 MonsterHouseTableState mhtable = DataManager.Instance.UniversalEvent.UniversalStates.GetWithDefault<MonsterHouseTableState>();
@@ -65,7 +65,7 @@ namespace PMDC.LevelGen
                     if (skipRoom)
                         continue;
                 }
-                
+
                 if (!BaseRoomFilter.PassesAllFilters(map.RoomPlan.GetRoomPlan(ii), this.Filters))
                     continue;
                 possibleRooms.Add(ii);
@@ -85,7 +85,7 @@ namespace PMDC.LevelGen
                 for (int y = room.Draw.Y; y < room.Draw.Y + room.Draw.Size.Y; y++)
                 {
                     Loc testLoc = new Loc(x, y);
-                    if (!map.TileBlocked(testLoc))
+                    if (!map.TileBlocked(testLoc) && room.IsLocInsideOpenedRoom(testLoc))
                     {
                         if (!map.HasTileEffect(new Loc(x, y)) && (map.GetPostProc(testLoc).Status & (PostProcType.Panel | PostProcType.Item)) == PostProcType.None)
                         {
@@ -136,7 +136,7 @@ namespace PMDC.LevelGen
             //the item spawn list in this class dictates the items available for spawning
             //it will be queried for items that match the theme selected
             List<MapItem> chosenItems = chosenItemTheme.GenerateItems(map, Items);
-            
+
             //place the items
             for (int ii = 0; ii < chosenItems.Count; ii++)
             {
@@ -159,12 +159,12 @@ namespace PMDC.LevelGen
             List<MobSpawn> chosenMobs = chosenMobTheme.GenerateMobs(map, Mobs);
 
             //cover the room in a check that holds all of the monsters, and covers the room's bounds
-            CheckIntrudeBoundsEvent check = new CheckIntrudeBoundsEvent();
-            check.Bounds = room.Draw;
+            CheckIntrudeBoundsLocsEvent check = new CheckIntrudeBoundsLocsEvent();
+            check.IsInBounds = room.IsLocInsideOpenedRoom;
             {
                 MonsterHouseMapEvent house = new MonsterHouseMapEvent();
                 house.Bounds = room.Draw;
-                
+
                 MonsterHouseTableState mhtable = DataManager.Instance.UniversalEvent.UniversalStates.GetWithDefault<MonsterHouseTableState>();
                 if (mhtable != null && mhtable.MonsterHouseWarningTile != null)
                 {
@@ -177,11 +177,11 @@ namespace PMDC.LevelGen
                             Tile tile = map.Tiles[xx][yy];
                             TerrainData data = tile.Data.GetData();
                             if (data.BlockType == TerrainData.Mobility.Passable)
-                                ((IPlaceableGenContext<EffectTile>)map).PlaceItem(loc,  new EffectTile(mhtable.MonsterHouseWarningTile, true));
+                                ((IPlaceableGenContext<EffectTile>)map).PlaceItem(loc, new EffectTile(mhtable.MonsterHouseWarningTile, true));
                         }
                     }
                 }
-                
+
                 foreach (MobSpawn mob in chosenMobs)
                 {
                     MobSpawn copyMob = mob.Copy();
